@@ -1,5 +1,5 @@
 <template>
-  <div class="home" :style="{width:`${screenWidth}px`}">
+  <div class="home">
     <el-container>
       <!-- 左边列表 -->
       <el-aside width="200px">
@@ -17,14 +17,14 @@
             <el-menu-item
               v-for="(gItem,gIndex) in item.groupItem"
               :key="gIndex"
-              :index="gItem.groupIndex"
+              :index="gItem.groupIndex"          
             >{{gItem.groupTitle}}</el-menu-item>
           </el-submenu>
         </el-menu>
       </el-aside>
       <el-container>
         <!-- 头部 -->
-        <el-header>
+        <el-header style="border-bottom:1px solid #e0e0e0">
           <div class="top">
             <div class="topLeft">
               <img src="../assets/caidan.png" alt class="topImg" />
@@ -40,54 +40,44 @@
           </div>
         </el-header>
         <!-- 主体 -->
-        <el-main class="main" height="700px">
+        <el-main class="main">
           <!-- 左边 -->
           <div class="mainLeft">
-            <div class="mainLeftTop">
-              <div class="blank">
-                <span class="blankSpan" v-for="(item,index) in blankLi" :key="index">
-                  <li class="blankLi1">{{item.num}}</li>
-                  <li class="blankLi2">{{item.font}}</li>
-                </span>
+            <div class="mainLeftTopMid">
+              <div class="mainLeftTop">
+                <div class="blank">
+                  <span class="blankSpan" v-for="(item,index) in blankLi" :key="index">
+                    <li class="blankLi1" v-show="index==1">{{item.num}}</li>
+                    <li class="blankLi1" v-show="index==0" style="color:red">{{item.num}}</li>
+                    <li class="blankLi1" v-show="index==2">
+                      {{item.num}}
+                      <span class="blankLichild">分钟</span>
+                    </li>
+                    <li class="blankLi2">{{item.font}}</li>
+                  </span>
+                </div>
               </div>
-            </div>
-            <div class="mainLeftMid">
-              <div id="lineChart"></div>
+              <div class="mainLeftMid">
+                <div class="linechartTitle">故障趋势图</div>
+                <div id="lineChart"></div>
+              </div>
             </div>
             <div class="mainLeftBut">
               <!-- 下左 -->
               <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+              <div class="piechartTitle">各资源类型故障占比</div>
               <div id="pieChart" style="width: 60%;height:100%;"></div>
               <div class="line"></div>
               <!-- 下右 -->
               <div class="verChart" style="width: 35%;">
-                <div class="verEle">
-                  <div class="ver" v-for="(item,index) in verData" :key="index">
-                    <span class="verFont">{{item.font}}</span>
-                    <el-progress :percentage="getPercentage(item.data)" :show-text="false" color="#94B3F9"></el-progress>
-                    <span class="verNum">{{item.data}}</span>
-                  </div>
-                </div>
-                <div class="verEle">
-                  <div class="ver" v-for="(item,index) in verData" :key="index">
-                    <span class="verFont">{{item.font}}</span>
-                    <el-progress :percentage="getPercentage(item.data)" :show-text="false" color="#E8BE90"></el-progress>
-                    <span class="verNum">{{item.data}}</span>
-                  </div>
-                </div>
-                <div class="verEle">
-                  <div class="ver" v-for="(item,index) in verData" :key="index">
-                    <span class="verFont">{{item.font}}</span>
-                    <el-progress :percentage="getPercentage(item.data)" :show-text="false" color="#FCE69F"></el-progress>
-                    <span class="verNum">{{item.data}}</span>
-                  </div>
-                </div>
+                <ver-chart :verData="verData"></ver-chart>
               </div>
             </div>
           </div>
           <!-- 右边 -->
           <div class="mainRight">
             <div class="mainRigTop">
+              <div class="rigchartTitle">按故障等级计算故障数量</div>
               <div id="rightChart" style="width: 100%;height:100%;"></div>
             </div>
             <div class="mainRigBut">
@@ -95,7 +85,13 @@
                 <div class="rightTable-title">故障影响的资源TOP5</div>
                 <div class="rightTable-body">
                   <el-table :data="tableData" height="96%">
-                    <el-table-column prop="date" label="日期" min-width="400"></el-table-column>
+                    <el-table-column type="index" width="50" class="tableIndex"></el-table-column>
+                    <el-table-column
+                      prop="address"
+                      label="日期"
+                      min-width="400"
+                      show-overflow-tooltip="true"
+                    ></el-table-column>
                     <el-table-column prop="name" label="姓名" min-width="100"></el-table-column>
                   </el-table>
                 </div>
@@ -110,7 +106,11 @@
    
 <script>
 import echarts from "echarts";
+import VerChart from "../components/verChart.vue";
 export default {
+  components: {
+    VerChart,
+  },
   data() {
     return {
       list: [
@@ -250,61 +250,78 @@ export default {
       topRightBtn: ["近7天", "近15天", "近30天", "自定义"],
       blankLi: [
         {
-          num: 1,
-          font: "第一列",
+          num: "3",
+          font: "未处理完成故障数",
         },
         {
-          num: 2,
-          font: "第二列",
+          num: "3",
+          font: "故障总数",
         },
         {
-          num: 3,
-          font: "第三列",
+          num: "32",
+          font: "故障平均处理时长",
         },
       ],
       tableData: [
         {
           date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1518 弄",
+          name: "1",
+          address:
+            "【上海市】普陀区金沙江路 1518 弄【上海市】普陀区金沙江路 1518 弄【上海市】普陀区金沙江路 1518 弄",
         },
         {
           date: "2016-05-02",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1518 弄",
+          name: "11",
+          address: "【上海市】普陀区金沙江路 1518 弄",
         },
         {
           date: "2016-05-04",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1518 弄",
+          name: "11",
+          address: "【上海市】普陀区金沙江路 1518 弄",
         },
         {
           date: "2016-05-01",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1518 弄",
+          name: "11",
+          address:
+            "【上海市】普陀区金沙江路 1518 弄【上海市】普陀区金沙江路 1518 弄【上海市】普陀区金沙江路 1518 弄【上海市】普陀区金沙江路 1518 弄",
         },
         {
           date: "2016-05-08",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1518 弄",
+          name: "11",
+          address: "【上海市】普陀区金沙江路 1518 弄",
         },
       ],
       verData: [
         {
-          font: "aad",
-          data: 6,
+          title: "IaaS",
+          font: ["主机", "防火墙", "交换机"],
+          data: [6, 4, 2],
+          color: "#94B3F9",
+          show: true,
+          isRotate: false
         },
         {
-          font: "aad",
-          data: 4,
+          title: "PaaS",
+          font: ["Mysql", "DBProxy", "Geteway"],
+          data: [6, 4, 2],
+          color: "#E8BE90",
+          show: true,
+          isRotate: false
         },
         {
-          font: "aad",
-          data: 2,
+          title: "SaaS",
+          font: ["应用", "场景", "服务"],
+          data: [6, 4, 2],
+          color: "#FCE69F",
+          show: true,
+          isRotate: false
         },
       ],
       screenWidth: document.body.clientWidth,
-      date:""
+      date: "",
+      isFixed: false,
+      offsetTop: 0,
+      clickShow: true,
     };
   },
   mounted() {
@@ -312,18 +329,8 @@ export default {
     this.lineChartFn();
     this.rightChartFn();
     const that = this;
-    window.onresize = () => {
-      return (() => {
-        window.screenWidth = document.body.clientWidth;
-        that.screenWidth = window.screenWidth;
-      })();
-    };
   },
-  watch: {
-    screenWidth(val) {
-      this.screenWidth = val;
-    },
-  },
+
   methods: {
     lineChartFn() {
       var lineChart = echarts.init(document.getElementById("lineChart"));
@@ -335,15 +342,43 @@ export default {
       });
 
       let option = {
-        title: {
-          left: "2.5%",
-          top: "4%",
-          text: "大数据量面积图",
+        // title: {
+        //   left: "2.5%",
+        //   top: 20,
+        //   text: "大数据量面积图",
+        //   textStyle: {
+        //     fontSize: 15,
+        //   },
+        // },
+        grid: {
+          // top
+          // left
+          bottom: 20,
+          left: 35,
+          right: 15,
+        },
+        tooltip: {
+          trigger: "axis",
         },
         xAxis: {
           type: "category",
           boundaryGap: false,
-          data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+          data: [
+            "Mon",
+            "Tue",
+            "Wed",
+            "Thu",
+            "Fri",
+            "Sat",
+            "Sun",
+            "Mon",
+            "Tue",
+            "Wed",
+            "Thu",
+            "Fri",
+            "Sat",
+            "Sun",
+          ],
           //显示竖轴参考线
           splitLine: { show: true },
           //改变x/y轴的颜色
@@ -368,21 +403,40 @@ export default {
 
         series: [
           {
-            data: [10, 12, 5, 4, 8, 9, 6],
+            data: [
+              4,
+              2,
+              2,
+              4,
+              0,
+              2,
+              2,
+              4,
+              4,
+              2,
+              2,
+              4,
+              0,
+              2,
+              2,
+              4,
+              0,
+              1,
+              2,
+              2,
+              4,
+            ],
             type: "line",
             //实现折点为圆
             showSymbol: true,
             symbol: "circle",
-            symbolSize: 20,
-            areaStyle: {},
-            smooth: true,
-            itemStyle: {
-              borderWidth: 2,
+            symbolSize: 6,
+            areaStyle: {
+              //  实现渐变色
               normal: {
-                //  实现渐变色
                 color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
                   {
-                    // 1代表上面
+                    // 0代表上面
                     offset: 0,
                     color: "#97AFF9",
                   },
@@ -391,12 +445,12 @@ export default {
                     color: "white",
                   },
                 ]),
-                opacity: 0.1, // 填充区域透明度
-                // 改变折线颜色
-                lineStyle: {
-                  color: "#97AFF9",
-                },
               },
+            },
+            smooth: true,
+            itemStyle: {
+              borderWidth: 2,
+              color: "#97AFF9",
             },
           },
         ],
@@ -413,11 +467,14 @@ export default {
       });
       var data = genData(3);
       let option = {
-        title: {
-          left: "4%",
-          top: "4%",
-          text: "大数据量面积图",
-        },
+        // title: {
+        //   left: "4%",
+        //   top: 20,
+        //   text: "大数据量面积图",
+        //   textStyle: {
+        //     fontSize: 15,
+        //   },
+        // },
         tooltip: {
           trigger: "item",
           formatter: "{a} <br/>{b} : {c} ({d}%)",
@@ -426,13 +483,30 @@ export default {
         color: ["#94B3F9", "#E8BE90", "#FCE69F"],
         legend: {
           textStyle: {
-            fontSize: 14,
+            rich: {
+              a: {
+                width: "100%",
+                fontSize: 13,
+              },
+              b: {
+                width: 40,
+                align: "left",
+                fontSize: 13,
+              },
+              c: {
+                width: 20,
+                align: "left",
+                fontSize: 13,
+              },
+            },
           },
+          itemWidth: 18,
           type: "scroll",
           orient: "vertical",
-          left: "57%",
+          left: "56%",
           right: "10%",
-          top: "35%",
+          top: "40%",
+          width: "auto",
           data: data.legendData,
           selected: data.selected,
           //显示百分比，重写formatter函数
@@ -447,8 +521,12 @@ export default {
                 tarValue = data[i].value;
               }
             }
+            // data.forEach()
             let p = ((tarValue / total) * 100).toFixed(2);
-            return name + "  " + "中间" + "  " + p + "%";
+            if (name.length >= 3) {
+              name = name.substr(0, 3) + "...";
+            }
+            return [`{a|${name}}`, `{b|中间}`, `{c|${p}%}`].join("");
           },
         },
 
@@ -456,7 +534,7 @@ export default {
           {
             name: "姓名",
             type: "pie",
-            radius: "55%",
+            radius: "45%",
             center: ["30%", "50%"],
             data: data.seriesData,
             label: {
@@ -527,14 +605,31 @@ export default {
         }, 10);
       });
       let option = {
-        title: {
-          left: "4%",
-          top: "4%",
-          text: "大数据量面积图",
+        // title: {
+        //   left: "4%",
+        //   top: 20,
+        //   text: "大数据量面积图",
+        //   textStyle: {
+        //     fontSize: 15,
+        //   },
+        // },
+        grid: {
+          bottom: 40,
+        },
+        tooltip: {
+          trigger: "axis",
         },
         xAxis: {
           type: "category",
-          data: ["Thu", "Fri", "Sat", "Sun"],
+          data: ["一级故障", "二级故障", "三级故障", "四级故障"],
+          axisLabel:{
+             textStyle:{
+            color:'#676767',
+            fontSize:15
+          }
+          }
+          ,
+         
           axisTick: [
             {
               show: false,
@@ -581,41 +676,46 @@ export default {
       };
       rightChart.setOption(option);
     },
-    //先把进度条里面的比例计算出来，再传送到进度条组件进行渲染
-    getPercentage(data) {
-      return (data / this.dataMax) * 100
-    },
     //获取当前时间
-    getTime(){
-      let date = new Date()
-      let year = date.getFullYear()
-      let month = date.getMonth() + 1 
-      let strDate = date.getDate()
-      if( month >= 0 && month <= 9){
-        month = "0" + month
+    getTime() {
+      let date = new Date();
+      let year = date.getFullYear();
+      let month = date.getMonth() + 1;
+      let strDate = date.getDate();
+      if (month >= 0 && month <= 9) {
+        month = "0" + month;
       }
-      if( strDate >= 0 && strDate <= 9){
-        strDate = "0" + strDate
+      if (strDate >= 0 && strDate <= 9) {
+        strDate = "0" + strDate;
       }
-      let currentDate = year + "/" + month + "/" + strDate
-      console.log(currentDate)
-      this.date=currentDate
+      let currentDate = year + "/" + month + "/" + strDate;
+      // console.log(currentDate);
+      this.date = currentDate;
+    },
+    verTileCLick(e) {
+      console.log("点击我了");
+      let title = document.querySelector(".verEle-Title");
+      this.clickShow = !this.clickShow;
+      console.log(this.clickShow);
     },
   },
-  computed: {
-    //计算进度条里面data的最大值
-    dataMax() {
-      return Math.max(...(this.verData.map(i => i.data)));
-    }
+  created() {
+    this.getTime();
   },
-  created(){
-    this.getTime()
-  }
 };
 </script>
 <style lang="scss" scoped>
+[data-v-fae5bece] .el-main[data-v-fae5bece][data-v-fae5bece] {
+  height: calc(100% - 60px);
+  overflow-y: hidden;
+}
+body {
+  margin: 0;
+}
 .home {
-  margin: 2%;
+  height: 100%;
+  overflow: hidden;
+  min-width: 900px;
 }
 .el-header,
 .el-footer {
@@ -655,6 +755,9 @@ body > .el-container {
 [data-v-fae5bece] .el-main[data-v-fae5bece] {
   height: 700px;
 }
+.el-container {
+  height: 100%;
+}
 // 头部
 ::v-deep .el-button--primary {
   padding: 8px 12px;
@@ -663,7 +766,8 @@ body > .el-container {
   display: flex;
   justify-content: space-between;
   font-size: 16px;
-  margin: 0 2% 0 0;
+  // margin: 0 0% 0 0;
+  // border: 1px solid #e0e0e0;
   .topLeft {
     .topImg {
       width: 16px;
@@ -682,72 +786,128 @@ body > .el-container {
 }
 //主体
 .main {
-  background: #efefef;
+  background: #f5f7fa;
   display: flex;
-  padding-top: 1%;
+  padding-top: 10px;
+  padding-left: 10px;
 }
 .mainLeft {
-  width: 55%;
+  width: 54%;
   display: inline-block;
-  .mainLeftTop {
-    height: 16%;
-    width: 100%;
-    padding: 0;
-    top: 0;
-    background: white;
-    .blank {
-      height: 100%;
-      display: flex;
-      justify-content: space-around;
-      list-style: none;
-      .blankSpan {
-        align-self: center;
-        .blankLi1 {
-          font-weight: 700;
-          font-size: 20px;
-        }
-        .blankLi2 {
-          margin-top: 53%;
-          color: grey;
-          font-size: 14px;
+  .line {
+    width: 0.5%;
+    height: 90%;
+    background: #efefef;
+    margin-top: 20px;
+    margin-right: 2%;
+  }
+  .mainLeftTopMid {
+    height: 40%;
+    .mainLeftTop {
+      height: 30%;
+      width: 100%;
+      padding: 0;
+      top: 0;
+      background: white;
+      border: 1px solid #e0e0e0;
+      .blank {
+        height: 100%;
+        display: flex;
+        justify-content: space-around;
+        list-style: none;
+        .blankSpan {
+          align-self: center;
+
+          .blankLi1 {
+            font-weight: 700;
+            font-size: 20px;
+            .blankLichild {
+              font-size: 15px;
+              color: #9e9e9e;
+              font-weight: 500;
+            }
+          }
+          .blankLi2 {
+            // margin-top: 55%;
+            color: #9e9e9e;
+            font-size: 15px;
+            font-weight: 700;
+            padding-top: 30px;
+          }
         }
       }
     }
-  }
-  .mainLeftMid {
-    width: 100%;
-    height: 30%;
-    margin: 2% 2% 0 0;
-    background: white;
-    #lineChart {
+    .mainLeftMid {
       width: 100%;
-      height: 180px;
+      height: calc(70% - 12px);
+      margin: 10px 0 0 0;
+      background: white;
+      border: 1px solid #e0e0e0;
+      position: relative;
+      .linechartTitle {
+        position: absolute;
+        padding-top: 20px;
+        font-size: 15px;
+        font-weight: 600;
+        padding-left: 20px;
+        color: black;
+      }
+      #lineChart {
+        width: 100%;
+        height: 90%;
+      }
     }
   }
-  .mainLeftBut {
-    width: 100%;
-    height: 45%;
-    margin: 2% 2% 0 0;
-    background: white;
-    display: flex;
+}
+.mainLeftBut {
+  width: 100%;
+  height: 55%;
+  margin: 12px 10px 0 0;
+  background: white;
+  display: flex;
+  border: 1px solid #e0e0e0;
+  position: relative;
+  .piechartTitle {
+    position: absolute;
+    padding-top: 20px;
+    font-size: 15px;
+    font-weight: 600;
+    padding-left: 20px;
+    color: black;
+  }
+  .verChart {
+    height: 70%;
+    margin-top: 10%;
   }
 }
+
 .mainRight {
-  width: 45%;
+  width: 44%;
   display: inline-block;
   .mainRigTop {
-    height: 49%;
+    height: 40%;
     width: 100%;
     padding: 0;
     top: 0;
-    margin: 0% 0% 2% 3%;
+    margin: 0 0 0 10px;
     background: white;
+    border: 1px solid #e0e0e0;
+    position: relative;
+    .rigchartTitle {
+      position: absolute;
+      padding-top: 20px;
+      font-size: 15px;
+      font-weight: 600;
+      padding-left: 20px;
+      color: black;
+    }
   }
   .mainRigBut {
     width: 100%;
-    height: 45%;
-    margin: 2.5% 0% 0 3%;
+    height: 55%;
+    margin: 10px 0 0 10px;
     background: white;
+    border: 1px solid #e0e0e0;
     // 表格
     .rightTable {
       height: 100%;
@@ -755,16 +915,15 @@ body > .el-container {
       position: relative;
       .rightTable-title {
         position: absolute;
-        padding-top: 3%;
-        height: 20px;
-        font-size: 18px;
+        padding-top: 20px;
+        font-size: 15px;
         font-weight: 600;
-        padding-left: 4%;
+        padding-left: 20px;
         color: black;
       }
       .rightTable-body {
         width: 92%;
-        padding-top: 5%;
+        padding-top: 6%;
         padding-left: 4%;
       }
     }
@@ -775,44 +934,23 @@ body > .el-container {
   line-height: 0;
   height: 550px;
 }
-.line {
-  width: 3px;
-  height: 90%;
-  background: #efefef;
-  margin-top: 20px;
-}
 
 ::v-deep .el-table th > .cell {
   height: 34px;
   line-height: 34px;
   background: #efefef;
+  color: black;
+  font-size: 15px;
 }
-.verChart {
-  margin-top: 5%;
-  .verEle {
-    margin-top: 4%;
-    .ver {
-      display: flex;
-      justify-content: space-around;
-      width: 100%;
-      margin-left: 5%;
-      height: 20px;
-      .verFont {
-        padding-right: 5%;
-        color: grey;
-        // line-height: 20px;
-      }
-      .verNum {
-        color: grey;
-        padding-left: 5%;
-      }
-    }
-  }
-}
+
 ::v-deep .el-progress {
   width: 100%;
 }
 ::v-deep .el-progress-bar__inner {
   background-color: #e8be90;
+}
+::v-deep .el-table--enable-row-transition .el-table__body td {
+  font-weight: 700;
+  color: grey;
 }
 </style>
