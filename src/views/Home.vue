@@ -1,89 +1,49 @@
 <template>
   <div class="home">
-    <el-container>
-      <!-- 左边列表 -->
-      <el-aside width="200px">
-        <el-menu>
-          <el-submenu
-            :default-openeds="['1', '3']"
-            v-for="(item,i) in list"
-            :key="i"
-            :index="`${i+1}`+`' '`"
-          >
-            <template slot="title">
-              <i :class="item.icon"></i>
-              {{item.title}}
-            </template>
-            <el-menu-item
-              v-for="(gItem,gIndex) in item.groupItem"
-              :key="gIndex"
-              :index="gItem.groupIndex"          
-            >{{gItem.groupTitle}}</el-menu-item>
-          </el-submenu>
-        </el-menu>
-      </el-aside>
-      <el-container>
-        <!-- 头部 -->
-        <el-header style="border-bottom:1px solid #e0e0e0">
-          <div class="top">
-            <div class="topLeft">
-              <img src="../assets/caidan.png" alt class="topImg" />
-              <span class="tlName">概况</span>
-            </div>
-            <div class="topRight">
-              <img src="../assets/caidan.png" alt class="topImg" />
-              <span class="trTime">{{date}}</span>
-              <span class="btn" v-for="(item,index) in topRightBtn" :key="index">
-                <el-button type="primary">{{item}}</el-button>
-              </span>
-            </div>
-          </div>
-        </el-header>
         <!-- 主体 -->
-        <el-main class="main">
           <!-- 左边 -->
-          <div class="mainLeft">
-            <div class="mainLeftTopMid">
-              <div class="mainLeftTop">
+          <div class="main-left">
+            <div class="main-lefttopmid">
+              <div class="main-lefttop">
                 <div class="blank">
-                  <span class="blankSpan" v-for="(item,index) in blankLi" :key="index">
-                    <li class="blankLi1" v-show="index==1">{{item.num}}</li>
-                    <li class="blankLi1" v-show="index==0" style="color:red">{{item.num}}</li>
-                    <li class="blankLi1" v-show="index==2">
+                  <span class="blan-span" v-for="(item,index) in blankLi" :key="index">
+                    <li class="blank-li1" v-show="index==1">{{item.num}}</li>
+                    <li class="blank-li1" v-show="index==0" style="color:red">{{item.num}}</li>
+                    <li class="blank-li1" v-show="index==2">
                       {{item.num}}
-                      <span class="blankLichild">分钟</span>
+                      <span class="blank-lichild">分钟</span>
                     </li>
-                    <li class="blankLi2">{{item.font}}</li>
+                    <li class="blank-li2">{{item.font}}</li>
                   </span>
                 </div>
               </div>
-              <div class="mainLeftMid">
-                <div class="linechartTitle">故障趋势图</div>
-                <div id="lineChart"></div>
+              <div class="main-leftmid">
+                <div class="linechart-title">故障趋势图</div>
+                <div id="linechart"></div>
               </div>
             </div>
-            <div class="mainLeftBut">
+            <div class="main-leftbut">
               <!-- 下左 -->
               <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
-              <div class="piechartTitle">各资源类型故障占比</div>
-              <div id="pieChart" style="width: 60%;height:100%;"></div>
+              <div class="piechart-title">各资源类型故障占比</div>
+              <div id="piechart" style="width: 60%;height:100%;"></div>
               <div class="line"></div>
               <!-- 下右 -->
-              <div class="verChart" style="width: 35%;">
+              <div class="verchart" style="width: 35%;">
                 <ver-chart :verData="verData"></ver-chart>
               </div>
             </div>
           </div>
           <!-- 右边 -->
-          <div class="mainRight">
-            <div class="mainRigTop">
-              <div class="rigchartTitle">按故障等级计算故障数量</div>
-              <div id="rightChart" style="width: 100%;height:100%;"></div>
+          <div class="main-right">
+            <div class="main-rigtop">
+              <div class="rigchart-title">按故障等级计算故障数量</div>
+              <div id="rightchart" style="width: 100%;height:100%;"></div>
             </div>
-            <div class="mainRigBut">
-              <div class="rightTable">
-                <div class="rightTable-title">故障影响的资源TOP5</div>
-                <div class="rightTable-body">
+            <div class="main-rigbut">
+              <div class="righttable">
+                <div class="righttable-title">故障影响的资源TOP5</div>
+                <div class="righttable-body">
                   <el-table :data="tableData" height="96%">
                     <el-table-column type="index" width="50" class="tableIndex"></el-table-column>
                     <el-table-column
@@ -98,18 +58,15 @@
               </div>
             </div>
           </div>
-        </el-main>
-      </el-container>
-    </el-container>
   </div>
 </template>
    
 <script>
 import echarts from "echarts";
-import VerChart from "../components/verChart.vue";
+import verChart from "../components/verChart";
 export default {
   components: {
-    VerChart,
+    verChart,
   },
   data() {
     return {
@@ -247,7 +204,7 @@ export default {
           ],
         },
       ],
-      topRightBtn: ["近7天", "近15天", "近30天", "自定义"],
+      toprightBtn: ["近7天", "近15天", "近30天", "自定义"],
       blankLi: [
         {
           num: "3",
@@ -320,36 +277,26 @@ export default {
       screenWidth: document.body.clientWidth,
       date: "",
       isFixed: false,
-      offsetTop: 0,
-      clickShow: true,
     };
   },
   mounted() {
     this.chartFn();
-    this.lineChartFn();
-    this.rightChartFn();
-    const that = this;
+    this.linechartFn();
+    this.rightchartFn();
   },
 
   methods: {
-    lineChartFn() {
-      var lineChart = echarts.init(document.getElementById("lineChart"));
+    linechartFn() {
+      var linechart = echarts.init(document.getElementById("linechart"));
+      
       //实现自适应，写setTimeout延迟是为了适应窗口缩放所产生的读写延迟
       window.addEventListener("resize", function () {
         setTimeout(function () {
-          lineChart.resize();
+          linechart.resize();
         }, 10);
       });
 
       let option = {
-        // title: {
-        //   left: "2.5%",
-        //   top: 20,
-        //   text: "大数据量面积图",
-        //   textStyle: {
-        //     fontSize: 15,
-        //   },
-        // },
         grid: {
           // top
           // left
@@ -362,6 +309,10 @@ export default {
         },
         xAxis: {
           type: "category",
+           axisTick: [
+            {
+              show: false,
+            }],
           boundaryGap: false,
           data: [
             "Mon",
@@ -393,6 +344,10 @@ export default {
           //改变y轴的值，先要把type改成category然后给data赋值
           type: "value",
           //改变x/y轴的颜色
+           axisTick: [
+            {
+              show: false,
+            }],
           axisLine: {
             lineStyle: {
               color: "#bcbcbc",
@@ -455,26 +410,18 @@ export default {
           },
         ],
       };
-      lineChart.setOption(option);
+      linechart.setOption(option);
     },
     chartFn() {
       // 基于准备好的dom，初始化echarts实例
-      var pieChart = echarts.init(document.getElementById("pieChart"));
+      var piechart = echarts.init(document.getElementById("piechart"));
       window.addEventListener("resize", function () {
         setTimeout(function () {
-          pieChart.resize();
+          piechart.resize();
         }, 10);
       });
       var data = genData(3);
       let option = {
-        // title: {
-        //   left: "4%",
-        //   top: 20,
-        //   text: "大数据量面积图",
-        //   textStyle: {
-        //     fontSize: 15,
-        //   },
-        // },
         tooltip: {
           trigger: "item",
           formatter: "{a} <br/>{b} : {c} ({d}%)",
@@ -560,7 +507,7 @@ export default {
           },
         ],
       };
-      pieChart.setOption(option);
+      piechart.setOption(option);
 
       function genData(count) {
         var nameList = ["强", "贾", "路", "娄", "危"];
@@ -597,22 +544,14 @@ export default {
         }
       }
     },
-    rightChartFn() {
-      var rightChart = echarts.init(document.getElementById("rightChart"));
+    rightchartFn() {
+      var rightchart = echarts.init(document.getElementById("rightchart"));
       window.addEventListener("resize", function () {
         setTimeout(function () {
-          rightChart.resize();
+          rightchart.resize();
         }, 10);
       });
       let option = {
-        // title: {
-        //   left: "4%",
-        //   top: 20,
-        //   text: "大数据量面积图",
-        //   textStyle: {
-        //     fontSize: 15,
-        //   },
-        // },
         grid: {
           bottom: 40,
         },
@@ -625,7 +564,7 @@ export default {
           axisLabel:{
              textStyle:{
             color:'#676767',
-            fontSize:15
+            fontSize:13
           }
           }
           ,
@@ -674,126 +613,23 @@ export default {
           },
         ],
       };
-      rightChart.setOption(option);
+      rightchart.setOption(option);
     },
-    //获取当前时间
-    getTime() {
-      let date = new Date();
-      let year = date.getFullYear();
-      let month = date.getMonth() + 1;
-      let strDate = date.getDate();
-      if (month >= 0 && month <= 9) {
-        month = "0" + month;
-      }
-      if (strDate >= 0 && strDate <= 9) {
-        strDate = "0" + strDate;
-      }
-      let currentDate = year + "/" + month + "/" + strDate;
-      // console.log(currentDate);
-      this.date = currentDate;
-    },
-    verTileCLick(e) {
-      console.log("点击我了");
-      let title = document.querySelector(".verEle-Title");
-      this.clickShow = !this.clickShow;
-      console.log(this.clickShow);
-    },
+
   },
-  created() {
-    this.getTime();
-  },
+
 };
 </script>
 <style lang="scss" scoped>
-[data-v-fae5bece] .el-main[data-v-fae5bece][data-v-fae5bece] {
-  height: calc(100% - 60px);
-  overflow-y: hidden;
-}
-body {
-  margin: 0;
-}
 .home {
   height: 100%;
-  overflow: hidden;
-  min-width: 900px;
-}
-.el-header,
-.el-footer {
-  color: #333;
-  text-align: center;
-  line-height: 60px;
-}
-
-.el-aside {
-  color: #333;
-  text-align: center;
-  line-height: 200px;
-}
-
-.el-main {
-  color: #333;
-  text-align: center;
-  line-height: 160px;
-  padding: 0;
-}
-
-body > .el-container {
-  margin-bottom: 40px;
-}
-
-.el-container:nth-child(5) .el-aside,
-.el-container:nth-child(6) .el-aside {
-  line-height: 260px;
-}
-
-.el-container:nth-child(7) .el-aside {
-  line-height: 320px;
-}
-::v-deep .el-menu {
-  text-align: left;
-}
-[data-v-fae5bece] .el-main[data-v-fae5bece] {
-  height: 700px;
-}
-.el-container {
-  height: 100%;
-}
-// 头部
-::v-deep .el-button--primary {
-  padding: 8px 12px;
-}
-.top {
+  // overflow: hidden;
   display: flex;
-  justify-content: space-between;
-  font-size: 16px;
-  // margin: 0 0% 0 0;
-  // border: 1px solid #e0e0e0;
-  .topLeft {
-    .topImg {
-      width: 16px;
-      padding-right: 8px;
-    }
-  }
-  .topRight {
-    .topImg {
-      width: 16px;
-      padding-right: 8px;
-    }
-    .btn {
-      padding-left: 8px;
-    }
-  }
 }
-//主体
-.main {
-  background: #f5f7fa;
-  display: flex;
-  padding-top: 10px;
-  padding-left: 10px;
-}
-.mainLeft {
-  width: 54%;
+.main-left {
+  width: 55%;
   display: inline-block;
+  height: 100%;
   .line {
     width: 0.5%;
     height: 90%;
@@ -801,9 +637,9 @@ body > .el-container {
     margin-top: 20px;
     margin-right: 2%;
   }
-  .mainLeftTopMid {
+  .main-lefttopmid {
     height: 40%;
-    .mainLeftTop {
+    .main-lefttop {
       height: 30%;
       width: 100%;
       padding: 0;
@@ -815,20 +651,19 @@ body > .el-container {
         display: flex;
         justify-content: space-around;
         list-style: none;
-        .blankSpan {
+        .blan-span {
           align-self: center;
 
-          .blankLi1 {
+          .blank-li1 {
             font-weight: 700;
             font-size: 20px;
-            .blankLichild {
+            .blank-lichild {
               font-size: 15px;
               color: #9e9e9e;
               font-weight: 500;
             }
           }
-          .blankLi2 {
-            // margin-top: 55%;
+          .blank-li2 {
             color: #9e9e9e;
             font-size: 15px;
             font-weight: 700;
@@ -837,14 +672,14 @@ body > .el-container {
         }
       }
     }
-    .mainLeftMid {
+    .main-leftmid {
       width: 100%;
       height: calc(70% - 12px);
       margin: 10px 0 0 0;
       background: white;
       border: 1px solid #e0e0e0;
       position: relative;
-      .linechartTitle {
+      .linechart-title {
         position: absolute;
         padding-top: 20px;
         font-size: 15px;
@@ -852,14 +687,14 @@ body > .el-container {
         padding-left: 20px;
         color: black;
       }
-      #lineChart {
+      #linechart {
         width: 100%;
         height: 90%;
       }
     }
   }
 }
-.mainLeftBut {
+.main-leftbut {
   width: 100%;
   height: 55%;
   margin: 12px 10px 0 0;
@@ -867,7 +702,7 @@ body > .el-container {
   display: flex;
   border: 1px solid #e0e0e0;
   position: relative;
-  .piechartTitle {
+  .piechart-title {
     position: absolute;
     padding-top: 20px;
     font-size: 15px;
@@ -875,16 +710,17 @@ body > .el-container {
     padding-left: 20px;
     color: black;
   }
-  .verChart {
+  .verchart {
     height: 70%;
     margin-top: 10%;
   }
 }
 
-.mainRight {
+.main-right {
   width: 44%;
   display: inline-block;
-  .mainRigTop {
+  height: 100%;
+  .main-rigtop {
     height: 40%;
     width: 100%;
     padding: 0;
@@ -893,7 +729,7 @@ body > .el-container {
     background: white;
     border: 1px solid #e0e0e0;
     position: relative;
-    .rigchartTitle {
+    .rigchart-title {
       position: absolute;
       padding-top: 20px;
       font-size: 15px;
@@ -902,18 +738,18 @@ body > .el-container {
       color: black;
     }
   }
-  .mainRigBut {
+  .main-rigbut {
     width: 100%;
     height: 55%;
     margin: 10px 0 0 10px;
     background: white;
     border: 1px solid #e0e0e0;
     // 表格
-    .rightTable {
+    .righttable {
       height: 100%;
       display: flex;
       position: relative;
-      .rightTable-title {
+      .righttable-title {
         position: absolute;
         padding-top: 20px;
         font-size: 15px;
@@ -921,20 +757,14 @@ body > .el-container {
         padding-left: 20px;
         color: black;
       }
-      .rightTable-body {
+      .righttable-body {
         width: 92%;
-        padding-top: 6%;
+        padding-top: 50px;
         padding-left: 4%;
       }
     }
   }
 }
-
-::v-deep .el-main[data-v-fae5bece] {
-  line-height: 0;
-  height: 550px;
-}
-
 ::v-deep .el-table th > .cell {
   height: 34px;
   line-height: 34px;
@@ -945,9 +775,6 @@ body > .el-container {
 
 ::v-deep .el-progress {
   width: 100%;
-}
-::v-deep .el-progress-bar__inner {
-  background-color: #e8be90;
 }
 ::v-deep .el-table--enable-row-transition .el-table__body td {
   font-weight: 700;

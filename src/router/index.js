@@ -13,6 +13,18 @@ Vue.use(VueRouter)
   {
     path: '/test',
     component: () => import('../components/test.vue')
+  },
+  {
+    path: '/test2',
+    component: () => import('../components/test2.vue')
+  },
+  {
+    path: '/piechart',
+    component: () => import('../components/pieChart.vue')
+  },
+  {
+    path: '/about',
+    component: () => import('../views/About.vue')
   }
 ]
 

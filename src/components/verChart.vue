@@ -1,27 +1,21 @@
 <template>
   <div>
-    <div class="verEle" v-for="(item,index) in verData" :key="index">
-      <div class="verEle-Title">
-         <span class="verBut">
-          <i :class="[item.isRotate ? 'el-icon-arrow-down rotateRight':'el-icon-arrow-down rotateDown']" @click="ratoteClick(item)"></i>
+    <div class="ver-ele" v-for="(item,index) in verData" :key="index">
+      <div class="ver-eletitle">
+         <span class="ver-but">
+          <i :class="[item.isRotate ? 'el-icon-arrow-down rotate-right':'el-icon-arrow-down rotate-down']" @click="ratoteClick(item)"></i>
         </span>
-        <!-- <span class="verBut">
-          <i class="el-icon-arrow-down translate" @click="item.show = !item.show" v-show="item.show"></i>
-        </span>
-        <span class="verBut">
-          <i class="el-icon-arrow-right" @click="item.show = !item.show" v-show="!item.show"></i>
-        </span> -->
         <span>{{item.title}}</span>
       </div>
       <div v-show="item.show">
         <div class="ver" :id="item.idName" v-for="(text,textIndex) in item.font" :key="textIndex">
-          <span class="verFont">{{text}}</span>
+          <span class="ver-font">{{text}}</span>
           <el-progress
             :percentage="getPercentage(item.data[textIndex])"
             :show-text="false"
             :color="item.color"
           ></el-progress>
-          <span class="verNum">{{item.data[textIndex]}}</span>
+          <span class="ver-num">{{item.data[textIndex]}}</span>
         </div>
       </div>
     </div>
@@ -72,23 +66,23 @@ export default {
     transform: rotate(90 deg);
   }
 }
-.verEle {
+.ver-ele {
   margin-top: 4%;
-  .verEle-Title {
+  .ver-eletitle {
     margin: 0 0 7% 0;
     display: flex;
     color: grey;
-    .verBut {
+    .ver-but {
       margin-top: -10px;
-      .rotateRight{
+      .rotate-right{
         transition:transform 0.5s ;
         transform:  rotate(-90deg);
       }
-      .rotateDown{
+      .rotate-down{
         transition:transform 0.5s ;
       }
     }
-    .verBut i:hover {
+    .ver-but i:hover {
       cursor: pointer;
     }
   }
@@ -99,11 +93,11 @@ export default {
     margin-left: 3%;
     height: 20px;
     font-size: 15px;
-    .verFont {
+    .ver-font {
       color: grey;
       width: 120px;
     }
-    .verNum {
+    .ver-num {
       color: grey;
       padding-left: 5%;
     }
